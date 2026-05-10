@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Farmacia SIMI - Gestión de Productos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ENCABEZADO -->
+    <header class="header">
+        <h1>🏥 ERP Farmacia SIMI</h1>
+        <p>Sistema de Gestión de Inventario de Productos</p>
+    </header>
+
+    <!-- NAVBAR LATERAL -->
+    <nav class="navbar">
+        <div class="navbar-header">
+            <span>📋 Menú</span>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="#inicio" class="nav-link active">🏠 Inicio</a></li>
+            <li><a href="#inventario" class="nav-link">📦 Inventario</a></li>
+            <li><a href="#reportes" class="nav-link">📊 Reportes</a></li>
+            <li><a href="#usuario" class="nav-link">👤 Usuario</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- SECCIÓN 1: FORMULARIO DE INGRESO DE DATOS -->
+        <section id="inicio" class="form-section">
+            <h2>📝 Registrar Nuevo Producto</h2>
+            <p class="section-desc">Complete los siguientes campos para agregar un producto al inventario:</p>
+            
+            <form id="productForm" class="product-form">
+                <!-- Campo: ID del Producto -->
+                <div class="form-group">
+                    <label for="productId">ID del Producto *</label>
+                    <input 
+                        type="number" 
+                        id="productId" 
+                        name="id"
+                        placeholder="Ej: 1001" 
+                        required
+                    >
+                </div>
+
+                <!-- Campo: Nombre/Producto -->
+                <div class="form-group">
+                    <label for="productName">Nombre del Producto *</label>
+                    <input 
+                        type="text" 
+                        id="productName" 
+                        name="product_name"
+                        placeholder="Ej: Paracetamol 500mg" 
+                        required
+                    >
+                </div>
+
+                <!-- Campo: Descripción -->
+                <div class="form-group">
+                    <label for="description">Descripción *</label>
+                    <textarea 
+                        id="description" 
+                        name="description"
+                        placeholder="Ej: Comprimido blanco, caja x 10 unidades"
+                        rows="3"
+                        required
+                    ></textarea>
+                </div>
+
+                <!-- Campo: Cantidad -->
+                <div class="form-group">
+                    <label for="quantity">Cantidad en Stock *</label>
+                    <input 
+                        type="number" 
+                        id="quantity" 
+                        name="quantity"
+                        placeholder="Ej: 150" 
+                        min="0"
+                        required
+                    >
+                </div>
+
+                <!-- Campo: Precio Unitario -->
+                <div class="form-group">
+                    <label for="unitPrice">Precio Unitario ($) *</label>
+                    <input 
+                        type="number" 
+                        id="unitPrice" 
+                        name="unit_price"
+                        placeholder="Ej: 4.99" 
+                        step="0.01"
+                        min="0"
+                        required
+                    >
+                </div>
+
+                <!-- Botón: Enviar Formulario -->
+                <button type="submit" class="btn btn-submit">📤 Registrar Producto</button>
+            </form>
+
+            <!-- Área de Mensajes del Formulario -->
+            <div id="formMessage" class="message-box"></div>
+        </section>
+
+        <!-- SECCIÓN 2: TABLA DE CONSULTA DE DATOS -->
+        <section id="inventario" class="table-section">
+            <div class="section-header">
+                <h2>📊 Inventario de Productos Registrados</h2>
+                <button id="fetchProductsBtn" class="btn btn-refresh">🔄 Actualizar</button>
+            </div>
+
+            <p class="section-desc">Lista de todos los productos en el sistema:</p>
+
+            <!-- Tabla Productos -->
+            <div class="table-wrapper">
+                <table id="productsTable" class="products-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Producto</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unit.</th>
+                            <th>Subtotal</th>
+                            <th>Fecha Registro</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <tr class="empty-row">
+                            <td colspan="7" style="text-align: center; padding: 20px;">
+                                ℹ️ No hay productos registrados aún. Registre el primer producto con el formulario arriba.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Estadísticas Inventario -->
+            <div class="stats-container">
+                <div class="stat-box">
+                    <h3>Total Productos</h3>
+                    <p id="totalProducts" class="stat-number">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Unidades</h3>
+                    <p id="totalUnits" class="stat-number">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Valor Total Inventario</h3>
+                    <p id="totalValue" class="stat-number">$0.00</p>
+                </div>
+            </div>
+
+            <!-- Mensajes de la Tabla -->
+            <div id="tableMessage" class="message-box"></div>
+        </section>
+
+        <!-- SECCIÓN 3: REPORTES -->
+        <section id="reportes" class="section-placeholder">
+            <h2>📊 Reportes</h2>
+            <p>Sección de reportes en desarrollo...</p>
+        </section>
+
+        <!-- SECCIÓN 4: USUARIO -->
+        <section id="usuario" class="section-placeholder">
+            <h2>👤 Perfil de Usuario</h2>
+            <p>Información de usuario en desarrollo...</p>
+        </section>
+    </div>
+
+    <!-- EDITAR PRODUCTO -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Producto</h2>
+                <button class="close-btn" id="closeEditModal">&times;</button>
+            </div>
+            <form id="editForm" class="product-form">
+                <div class="form-group">
+                    <label for="editProductId">ID del Producto</label>
+                    <input type="number" id="editProductId" name="id" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="editProductName">Nombre del Producto</label>
+                    <input type="text" id="editProductName" name="product_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">Descripción</label>
+                    <textarea id="editDescription" name="description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editQuantity">Cantidad en Stock</label>
+                    <input type="number" id="editQuantity" name="quantity" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUnitPrice">Precio Unitario ($)</label>
+                    <input type="number" id="editUnitPrice" name="unit_price" step="0.01" min="0" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-submit">💾 Guardar Cambios</button>
+                    <button type="button" class="btn btn-cancel" id="cancelEditBtn">❌ Cancelar</button>
+                </div>
+            </form>
+            <div id="editMessage" class="message-box"></div>
+        </div>
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="footer">
+        <p>ERP Farmacia SIMI © 2026 | Tecnologías: HTML5, CSS3, JavaScript, PHP, MariaDB | Arquitectura: 3 Capas</p>
+    </footer>
+
+    <!-- Script de Comunicación con Backend -->
+    <script src="app.js"></script>
+</body>
+</html>
