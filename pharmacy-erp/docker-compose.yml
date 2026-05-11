@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    build: ./database
+    container_name: simi_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: pharmacy_erp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - simi-net
+    restart: always
+  
+  backend:
+    build: ./backend
+    container_name: simi_backend
+    ports:
+      - "80:80"
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: admin123
+      DB_NME: pharmacy_erp
+      DB_HOST: db
+    depends_on:
+      - db
+    networks:
+      - simi-net
+    restart: always
+  
+  frontend:
+    build: ./frontend
+    container_name: simi_frontend
+    ports:
+      - "8080:80"
+    networks:
+      - simi-net
+    restart: always
+  
+  networks:
+    simi-net:
+      driver: bridge
+  
+  volumes:
+    pgdata:
