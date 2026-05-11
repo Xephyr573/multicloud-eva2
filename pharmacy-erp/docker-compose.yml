@@ -13,7 +13,7 @@ services:
     networks:
       - simi-net
     restart: always
-  
+
   backend:
     build: ./backend
     container_name: simi_backend
@@ -22,14 +22,14 @@ services:
     environment:
       DB_USER: postgres
       DB_PASSWORD: admin123
-      DB_NME: pharmacy_erp
+      DB_NAME: pharmacy_erp
       DB_HOST: db
     depends_on:
       - db
     networks:
       - simi-net
     restart: always
-  
+
   frontend:
     build: ./frontend
     container_name: simi_frontend
@@ -38,10 +38,10 @@ services:
     networks:
       - simi-net
     restart: always
-  
-  networks:
-    simi-net:
-      driver: bridge
-  
-  volumes:
-    pgdata:
+
+networks:
+  simi-net:
+    driver: bridge
+
+volumes:
+  pgdata:
