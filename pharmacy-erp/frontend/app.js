@@ -1,5 +1,5 @@
 // Configuración
-const API_BASE_URL = 'http://localhost/api/productos';
+const API_BASE_URL = '/api/productos';
 
 // DOM Elements
 const productForm = document.getElementById('productForm');
