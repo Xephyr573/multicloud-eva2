@@ -1,5 +1,5 @@
 // Configuración
-const API_BASE_URL = 'http://localhost/pharmacy-erp/backend/api.php';
+const API_BASE_URL = 'http://localhost/api/productos';
 
 // DOM Elements
 const productForm = document.getElementById('productForm');
@@ -95,7 +95,7 @@ async function handleFormSubmit(e) {
     try {
         showFormMessage('Registrando producto...', 'info');
 
-        const response = await fetch(API_BASE_URL + '?action=create', {
+        const response = await fetch(API_BASE_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ async function fetchAllProducts() {
     try {
         tableMessage.innerHTML = '';
 
-        const response = await fetch(API_BASE_URL + '?action=list', {
+        const response = await fetch(API_BASE_URL, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -187,7 +187,7 @@ function displayProducts(products) {
 async function openEditModal(productId) {
     try {
         // Obtener datos del producto
-        const response = await fetch(API_BASE_URL + '?action=get&id=' + productId, {
+        const response = await fetch(`${API_BASE_URL}/${productId}`, {
             method: 'GET'
         });
 
@@ -254,7 +254,7 @@ async function handleEditSubmit(e) {
     try {
         editMessage.innerHTML = '<p class="info">Actualizando producto...</p>';
 
-        const response = await fetch(API_BASE_URL + '?action=update', {
+        const response = await fetch(`${API_BASE_URL}/${editingProductId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -288,7 +288,7 @@ async function deleteProduct(productId) {
     }
 
     try {
-        const response = await fetch(API_BASE_URL + '?action=delete&id=' + productId, {
+        const response = await fetch(`${API_BASE_URL}/${productId}`, {
             method: 'DELETE'
         });
 
