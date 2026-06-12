@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  db:
+    build: 
+      context: ./database
+    container_name: simi_db
+    restart: always
+    ports: ["5432:5432"]
+    environment:
+      POSTGRES_DB: pharmacy_erp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+    networks:
+      - simi-net
+    
+  web:
+    build:
+      context: .
+      dockerfile: backend/dockerfile
+    container_name: simi_web
+    restart: always
+    ports: ["80:80"]
+    environment:
+      - DB_HOST=${DB_HOST:-db}
+      - DB_USER=postgres
+      - DB_PASSWORD=admin123
+      - DB_NAME=pharmacy_erp
+    networks:
+      - simi-net
+
+networks:
+  simi-net:
+    driver: bridge

@@ -7,12 +7,19 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="login-container" style="display:block;">
+    <h2>🔐 Acceso Sistema SIMI</h2>
+    <input type="text" id="user" placeholder="Usuario">
+    <input type="password" id="pass" placeholder="Contraseña">
+    <button onclick="login()">Ingresar</button>
+</div>
+    <div id="main-content" style="display:none;">
     <!-- ENCABEZADO -->
     <header class="header">
         <h1>🏥 ERP Farmacia SIMI</h1>
         <p>Sistema de Gestión de Inventario de Productos</p>
     </header>
-
+</div>
     <!-- NAVBAR LATERAL -->
     <nav class="navbar">
         <div class="navbar-header">
@@ -213,6 +220,12 @@
     </footer>
 
     <!-- Script de Comunicación con Backend -->
+    <script>
+    async function login() {
+        // Lógica de fetch a /api/login, luego prompt para MFA
+        // Si es exitoso, mostrar document.getElementById('main-content').style.display = 'block';
+    }
+</script>
     <script src="app.js"></script>
 </body>
 </html>

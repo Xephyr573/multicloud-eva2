@@ -1,14 +1,17 @@
-// backend/server.js
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const jwt = require('jsonwebtoken');
+const speakeasy = require('speakeasy');
+const path = require('path');
 
 const app = express();
-const port = 80; // La rúbrica pide exponer la API en el puerto 80
+const port = 80;
+const SECRET_KEY = 'MI_LLAVE_SECRETA_SIMI'; // En prod usar variable de entorno
 
-// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Configuración de la conexión a PostgreSQL
 // En Docker, el host será el nombre del servicio de la BD (ej. 'postgres-db')
@@ -20,8 +23,44 @@ const pool = new Pool({
     port: 5432,
 });
 
+// Middleware para proteger rutas
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) return res.sendStatus(401);
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+// Login: Genera un token temporal para el MFA
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    // Simulación: usuario admin/admin
+    if (username === 'admin' && password === 'admin') {
+        const secret = speakeasy.generateSecret();
+        res.json({ success: true, tempToken: 'pre-mfa-token', secret: secret.base32 });
+    } else {
+        res.status(401).json({ success: false, message: 'Credenciales inválidas' });
+    }
+});
+
+// Verificación MFA
+app.post('/api/mfa/verify', (req, res) => {
+    const { token, secret } = req.body;
+    const verified = speakeasy.totp.verify({ secret, encoding: 'base32', token });
+    if (verified) {
+        const accessToken = jwt.sign({ user: 'admin' }, SECRET_KEY, { expiresIn: '1h' });
+        res.json({ success: true, accessToken });
+    } else {
+        res.status(401).json({ success: false, message: 'Código MFA inválido' });
+    }
+});
+
 // GET: Obtener todos los productos
-app.get('/api/productos', async (req, res) => {
+app.get('/api/productos', authenticateToken, async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
         res.json({ success: true, message: 'Productos obtenidos', data: result.rows });
@@ -32,7 +71,7 @@ app.get('/api/productos', async (req, res) => {
 });
 
 // GET: Obtener un producto por ID (para el modal de edición)
-app.get('/api/productos/:id', async (req, res) => {
+app.get('/api/productos/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
@@ -47,7 +86,7 @@ app.get('/api/productos/:id', async (req, res) => {
 });
 
 // POST: Crear un nuevo producto
-app.post('/api/productos', async (req, res) => {
+app.post('/api/productos', authenticateToken, async (req, res) => {
     try {
         const { id, product_name, description, quantity, unit_price } = req.body;
         
@@ -68,7 +107,7 @@ app.post('/api/productos', async (req, res) => {
 });
 
 // PUT: Actualizar un producto
-app.put('/api/productos/:id', async (req, res) => {
+app.put('/api/productos/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         const { product_name, description, quantity, unit_price } = req.body;
@@ -90,7 +129,7 @@ app.put('/api/productos/:id', async (req, res) => {
 });
 
 // DELETE: Eliminar un producto
-app.delete('/api/productos/:id', async (req, res) => {
+app.delete('/api/productos/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         const result = await pool.query('DELETE FROM products WHERE id = $1', [id]);
