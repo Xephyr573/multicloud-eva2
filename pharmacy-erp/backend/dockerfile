@@ -1,0 +1,25 @@
+# backend/Dockerfile
+FROM node:18-alpine
+
+# directorio base del contenedor
+WORKDIR /usr/src/app
+
+# package para instalar dependencias
+COPY backend/package*.json ./backend/
+WORKDIR /usr/src/app/backend
+RUN npm install
+
+# docker vuelve a la raiz para copiar ambos dockerfile
+WORKDIR /usr/src/app
+# copiamos el backend y el front en el mismo contenedor
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
+
+# definimos el directorio de trabajo donde esta "server.js"
+WORKDIR /usr/src/app/backend
+
+# exponer el puerto 80 (rubrica)
+EXPOSE 80
+
+# comando para iniciar aplicacion docker
+CMD [ "node", "server.js" ]
